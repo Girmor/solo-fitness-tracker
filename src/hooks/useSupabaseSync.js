@@ -119,15 +119,35 @@ export const useSupabaseSync = (gameData, updateGameData) => {
 
     setSyncing(true);
     try {
-      const { error } = await supabase
+      // First, check if record exists
+      const { data: existing } = await supabase
         .from('user_data')
-        .upsert({
-          user_id: user.id,
-          game_data: data,
-          updated_at: new Date().toISOString(),
-        });
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
 
-      if (error) throw error;
+      let result;
+      if (existing) {
+        // Update existing record
+        result = await supabase
+          .from('user_data')
+          .update({
+            game_data: data,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', user.id);
+      } else {
+        // Insert new record
+        result = await supabase
+          .from('user_data')
+          .insert({
+            user_id: user.id,
+            game_data: data,
+            updated_at: new Date().toISOString(),
+          });
+      }
+
+      if (result.error) throw result.error;
 
       setLastSync(new Date());
       console.log('✅ Data synced to cloud');
