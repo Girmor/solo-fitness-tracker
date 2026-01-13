@@ -1,5 +1,8 @@
 import React from 'react';
 import { calculateStats } from '../../utils/calculations';
+import ProgressChart from '../Charts/ProgressChart';
+import ExerciseDistribution from '../Charts/ExerciseDistribution';
+import WeeklyProgress from '../Charts/WeeklyProgress';
 
 const Stats = ({ gameData }) => {
   const { player, history, streak } = gameData;
@@ -60,6 +63,17 @@ const Stats = ({ gameData }) => {
           <div className="text-sm text-gray-400 mt-2">DAYS</div>
         </div>
       </div>
+
+      {/* Progress Charts */}
+      {history.dailyHistory && history.dailyHistory.length > 0 && (
+        <>
+          <ProgressChart dailyHistory={history.dailyHistory} />
+          <WeeklyProgress dailyHistory={history.dailyHistory} />
+        </>
+      )}
+
+      {/* Exercise Distribution */}
+      <ExerciseDistribution exerciseHistory={history.exerciseHistory} />
 
       {/* Rank Info */}
       <div className="border-2 border-gray-600 p-6 bg-system-darker">

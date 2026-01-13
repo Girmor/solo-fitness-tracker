@@ -54,6 +54,8 @@ export const getDefaultPlayerData = () => ({
     dailyCompletions: 0,
     exerciseHistory: {},
     bestStreak: 0,
+    dailyHistory: [], // Array of { date: 'YYYY-MM-DD', exercises: {}, totalExp: 0 }
+    weeklyHistory: [], // Array of { week: 'YYYY-Wxx', exercises: {}, totalExp: 0 }
   },
   skills: [],
   achievements: [],

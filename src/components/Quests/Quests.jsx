@@ -14,6 +14,28 @@ const Quests = ({ gameData, updateGameData }) => {
     setInputValues({ ...inputValues, [selectedExercise]: value });
   };
 
+  const updateDailyHistory = (dailyHistory, exerciseId, value, exp) => {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const updatedDailyHistory = [...(dailyHistory || [])];
+
+    // Find or create today's entry
+    let todayEntry = updatedDailyHistory.find(day => day.date === today);
+    if (!todayEntry) {
+      todayEntry = { date: today, exercises: {}, totalExp: 0, totalWorkouts: 0 };
+      updatedDailyHistory.push(todayEntry);
+    }
+
+    // Update today's entry
+    if (!todayEntry.exercises[exerciseId]) {
+      todayEntry.exercises[exerciseId] = 0;
+    }
+    todayEntry.exercises[exerciseId] += value;
+    todayEntry.totalExp += exp;
+    todayEntry.totalWorkouts += 1;
+
+    return updatedDailyHistory;
+  };
+
   const handleAddProgress = () => {
     const value = parseFloat(inputValues[selectedExercise] || 0);
     if (value <= 0) return;
@@ -41,6 +63,9 @@ const Quests = ({ gameData, updateGameData }) => {
       updatedHistory[selectedExercise].withWeight.push({ value, date: Date.now() });
     }
 
+    // Update daily history
+    const updatedDailyHistory = updateDailyHistory(history.dailyHistory, selectedExercise, value, exp);
+
     // Add experience
     const { updatedPlayer, newMessages } = addExperience(player, exp, systemMessages);
 
@@ -64,6 +89,7 @@ const Quests = ({ gameData, updateGameData }) => {
         ...history,
         exerciseHistory: updatedHistory,
         totalWorkouts: history.totalWorkouts + 1,
+        dailyHistory: updatedDailyHistory,
       },
       systemMessages: newMessages,
     });
